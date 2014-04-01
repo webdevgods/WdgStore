@@ -1,0 +1,43 @@
+{
+    "name": "webdevgods/wdg-store",
+    "description": "Store Module for Zend Framework 2.",
+    "type": "zf-module",
+    "license": "MIT",
+    "keywords": [
+        "library",
+        "libs",
+        "webdevgods",
+        "wdg",
+        "module",
+        "store"
+    ],
+    "homepage": "https://github.com/webdevgods/WdgStore",
+    "authors": [
+        {
+            "name": "Jessie Green",
+            "email": "jessie.ims@gmail.com",
+            "homepage": "http://jessiegreen.com/"
+        },
+        {
+            "name": "Dustin Moorman",
+            "email": "dustin.moorman@gmail.com",
+            "homepage": "http://dustinmoorman.com/"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "suggest": {
+        "webdevgods/wdg-zf2": "Base set of libraries for using zend framework 2.",
+        "webdevgods/wdg-doctrine2": "Base set of libraries for using doctrine.",
+        "webdevgods/wdg-base": "Base set of libraries for general php deeds."
+    },
+    "autoload": {
+        "psr-0": {
+            "WdgBase": "src/"
+        },
+        "classmap": [
+            "./Module.php"
+        ]
+    }
+}
