@@ -4,6 +4,7 @@ namespace WdgStore\Entity;
 use Doctrine\ORM\Mapping as ORM,
     WdgDoctrine2\Entity\Entity,
     Doctrine\Common\Collections\ArrayCollection;
+use WdgStore\Repository\Subscription;
 
 /**
  * Category
@@ -54,13 +55,21 @@ class Category extends Entity
     protected $Products;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Subscription", mappedBy="Categories")
+     */
+    protected $Subscriptions;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         parent::__construct();
 
-        $this->Posts = new ArrayCollection();
+        $this->Products = new ArrayCollection();
+        $this->Subscriptions = new ArrayCollection();
     }
 
     /**
@@ -151,6 +160,38 @@ class Category extends Entity
         $this->Products->removeElement($product);
 
         $product->removeCategory($this);
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection|\Doctrine\Common\Collections\Collection
+     */
+    public function getSubscriptions()
+    {
+        return $this->Subscriptions;
+    }
+
+    /**
+     * @param Subscription $subscription
+     */
+    public function addSubscription(Subscription $subscription)
+    {
+        if ($this->Subscriptions->contains($subscription)) return;
+
+        $this->Subscriptions->add($subscription);
+
+        $subscription->addCategory($this);
+    }
+
+    /**
+     * @param Subscription $subscription
+     */
+    public function removeSubscription(Subscription $subscription)
+    {
+        if (!$this->Subscriptions->contains($subscription)) return;
+
+        $this->Subscriptions->removeElement($subscription);
+
+        $subscription->removeCategory($this);
     }
 
 }
