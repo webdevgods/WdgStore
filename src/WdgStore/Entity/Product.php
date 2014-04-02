@@ -145,7 +145,7 @@ class Product extends Entity
     }
 
     /**
-     * @param string $excerpt
+     * @param string $price
      * @return Product
      */
     public function setPrice($price)
