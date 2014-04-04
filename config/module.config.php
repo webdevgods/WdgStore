@@ -14,4 +14,20 @@ return array(
             )
         )
     ),
+    'view_manager' => array(
+        'template_path_stack' => array(
+            __DIR__ . '/../view',
+        ),
+    ),
+    'module_layouts' => array(
+        'WdgStore' => 'application/layout/layout',
+    ),
+    'navigation' => array(
+        'admin' => array(
+            'wdgstore' => array(
+                'label' => 'Store',
+                'route' => 'zfcadmin/wdg-store-admin'
+            ),
+        ),
+    ),
 );
