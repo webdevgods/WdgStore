@@ -15,6 +15,43 @@ class Store extends ServiceAbstract
     protected $entityManager;
 
     /**
+     * @var \WdgStore\Repository\Product
+     */
+    protected $productRepos;
+
+    /**
+     * @var \WdgStore\Repository\Category
+     */
+    protected $categoryRepos;
+
+
+    /**
+     * @return \Doctrine\ORM\EntityRepository
+     */
+    public function getPostRepository()
+    {
+        if (null === $this->postRepos)
+        {
+            $this->productRepos = $this->getServiceManager()->get('wdgstore_repos_product');
+        }
+
+        return $this->productRepos;
+    }
+
+    /**
+     * @return \Doctrine\ORM\EntityRepository
+     */
+    public function getCategoryRepository()
+    {
+        if (null === $this->categoryRepos)
+        {
+            $this->categoryRepos = $this->getServiceManager()->get('wdgstore_repos_category');
+        }
+
+        return $this->categoryRepos;
+    }
+
+    /**
      * @return \Doctrine\ORM\EntityManager
      */
     protected function getEntityManager()
@@ -26,4 +63,5 @@ class Store extends ServiceAbstract
 
         return $this->entityManager;
     }
+
 }
