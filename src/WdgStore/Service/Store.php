@@ -9,4 +9,21 @@ use Zend\Form\Form,
 class Store extends ServiceAbstract
 {
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * @return \Doctrine\ORM\EntityManager
+     */
+    protected function getEntityManager()
+    {
+        if($this->entityManager === null)
+        {
+            $this->entityManager = $this->getServiceManager()->get("wdgstore_doctrine_em");
+        }
+
+        return $this->entityManager;
+    }
 }
