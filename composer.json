@@ -26,10 +26,10 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "webdevgods/wdg-doctrine2": "Base set of libraries for using doctrine."
+        "webdevgods/wdg-doctrine2": "Base set of libraries for using doctrine.",
+        "webdevgods/wdg-zf2": "Base set of libraries for using zend framework 2."
     },
     "suggest": {
-        "webdevgods/wdg-zf2": "Base set of libraries for using zend framework 2.",
         "webdevgods/wdg-base": "Base set of libraries for general php deeds."
     },
     "autoload": {
