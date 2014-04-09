@@ -90,4 +90,19 @@ class Store extends ServiceAbstract
         return $this->getCategoryRepository()->findBy(array(), array('name' => 'ASC'));
     }
 
+    /**
+     * @param $id
+     * @return Form
+     */
+    public function getEditCategoryForm($id)
+    {
+        $Category = $this->getCategoryById($id);
+        /* @var $form \Zend\Form\Form */
+        $form = $this->getServiceManager()->get('FormElementManager')->get('wdgstore_category_edit_form');
+
+        $form->populateValues($Category->toArray());
+
+        return $form;
+    }
+
 }
