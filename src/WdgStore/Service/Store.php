@@ -74,6 +74,15 @@ class Store extends ServiceAbstract
     }
 
     /**
+     * @param $slug
+     * @return CategoryEntity
+     */
+    public function getCategoryBySlug($slug)
+    {
+        return $this->getCategoryRepository()->findOneBy(array("slug" => $slug));
+    }
+
+    /**
      * @param int $id
      * @return ProductEntity
      */
@@ -81,6 +90,16 @@ class Store extends ServiceAbstract
     {
         return $this->getProductRepository()->findOneBy(array("id" => $id));
     }
+
+    /**
+     * @param $id
+     * @return CategoryEntity
+     */
+    public function getCategoryById($id)
+    {
+        return $this->getCategoryRepository()->findOneBy(array("id" => $id));
+    }
+
 
     /**
      * @return array
