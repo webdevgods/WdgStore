@@ -73,4 +73,21 @@ class Store extends ServiceAbstract
         return $this->getProductRepository()->findOneBy(array("slug" => $slug));
     }
 
+    /**
+     * @param int $id
+     * @return ProductEntity
+     */
+    public function getProductById($id)
+    {
+        return $this->getProductRepository()->findOneBy(array("id" => $id));
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllCategories()
+    {
+        return $this->getCategoryRepository()->findBy(array(), array('name' => 'ASC'));
+    }
+
 }
