@@ -163,4 +163,33 @@ class Store extends ServiceAbstract
         return $Category;
     }
 
+    /**
+     * @param array $array
+     * @return CategoryEntity
+     * @throws FormException
+     */
+    public function editCategoryByArray($array)
+    {
+        $form   = $this->getEditCategoryForm($array["id"]);
+        $em     = $this->getEntityManager();
+
+        $form->setData($array);
+
+        if(!$form->isValid())throw new FormException("Form values are invalid");
+
+        $data   = $form->getInputFilter()->getValues();
+
+        $Category = $this->getCategoryById($data["id"]);
+
+        $Category->setName($data["name"])
+            ->setSlug($data["slug"]);
+
+        $em->persist($Category);
+
+        $em->flush();
+
+        return $Category;
+    }
+
+
 }
