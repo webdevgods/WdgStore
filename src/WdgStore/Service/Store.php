@@ -105,4 +105,18 @@ class Store extends ServiceAbstract
         return $form;
     }
 
+    /**
+     * @param $id
+     * @return Form
+     */
+    public function getEditProductForm($id)
+    {
+        $Post = $this->getPostById($id);
+        /* @var $form \Zend\Form\Form */
+        $form = $this->getServiceManager()->get('FormElementManager')->get('wdgblog_post_edit_form');
+
+        $form->populateValues($Post->toArray());
+
+        return $form;
+    }
 }
