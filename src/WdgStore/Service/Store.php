@@ -113,7 +113,7 @@ class Store extends ServiceAbstract
     {
         $Post = $this->getPostById($id);
         /* @var $form \Zend\Form\Form */
-        $form = $this->getServiceManager()->get('FormElementManager')->get('wdgblog_post_edit_form');
+        $form = $this->getServiceManager()->get('FormElementManager')->get('wdgstore_post_edit_form');
 
         $form->populateValues($Post->toArray());
 
@@ -135,5 +135,32 @@ class Store extends ServiceAbstract
     {
         return $this->getServiceManager()->get('FormElementManager')->get('wdgstore_category_add_form');
     }
-}
 
+    /**
+     * @param array $array
+     * @return \WdgStore\Entity\Category
+     * @throws FormException
+     */
+    public function addCategoryByArray(array $array)
+    {
+        $form   = $this->getAddCategoryForm();
+        $em     = $this->getEntityManager();
+
+        $form->setData($array);
+
+        if(!$form->isValid())throw new FormException("Form values are invalid");
+
+        $data       = $form->getInputFilter()->getValues();
+        $Category   = new CategoryEntity();
+
+        $Category->setName($data["name"])
+            ->setSlug($data["slug"]);
+
+        $em->persist($Category);
+
+        $em->flush();
+
+        return $Category;
+    }
+
+}
