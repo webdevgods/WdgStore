@@ -119,4 +119,21 @@ class Store extends ServiceAbstract
 
         return $form;
     }
+
+    /**
+     * @return Form
+     */
+    public function getAddProductForm()
+    {
+        return $this->getServiceManager()->get('FormElementManager')->get('wdgstore_product_add_form');
+    }
+
+    /**
+     * @return Form
+     */
+    public function getAddCategoryForm()
+    {
+        return $this->getServiceManager()->get('FormElementManager')->get('wdgstore_category_add_form');
+    }
 }
+
