@@ -3,7 +3,7 @@ namespace WdgStore\Service;
 
 use Zend\Form\Form,
     WdgZf2\Service\ServiceAbstract,
-    WdgStore\Entity\Product as PostEntity,
+    WdgStore\Entity\Product as ProductEntity,
     WdgStore\Entity\Category as CategoryEntity;
 
 class Store extends ServiceAbstract
@@ -28,7 +28,7 @@ class Store extends ServiceAbstract
     /**
      * @return \Doctrine\ORM\EntityRepository
      */
-    public function getPostRepository()
+    public function getProductRepository()
     {
         if (null === $this->postRepos)
         {
@@ -62,6 +62,15 @@ class Store extends ServiceAbstract
         }
 
         return $this->entityManager;
+    }
+
+    /**
+     * @param string $slug
+     * @return ProductEntity
+     */
+    public function getProductBySlug($slug)
+    {
+        return $this->getProductRepository()->findOneBy(array("slug" => $slug));
     }
 
 }
