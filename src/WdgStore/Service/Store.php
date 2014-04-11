@@ -3,6 +3,7 @@ namespace WdgStore\Service;
 
 use Zend\Form\Form,
     WdgZf2\Service\ServiceAbstract,
+    Zend\Paginator\Paginator as ZendPaginator,
     WdgStore\Entity\Product as ProductEntity,
     WdgStore\Entity\Category as CategoryEntity;
 
@@ -210,5 +211,24 @@ class Store extends ServiceAbstract
         return $Category;
     }
 
+    /**
+     * @param string $slug
+     * @param int $pageNumber
+     * @param int $productsPerPage
+     * @return ZendPaginator
+     */
+    public function getProductByCategorySlugPaginator($slug, $pageNumber, $productsPerPage)
+    {
+        $paginator = new ZendPaginator(
+            new PaginatorAdapter( //@todo include paginator
+                new ORMPaginator(
+                    $this->getProductRepository()
+                        ->findProductsByCategorySlugPaginationQuery($slug) //@todo write this method
+                )
+            )
+        );
+
+        return $paginator->setCurrentPageNumber($pageNumber)->setItemCountPerPage($productsPerPage);
+    }
 
 }
