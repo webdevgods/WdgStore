@@ -1,3 +1,58 @@
 <?php
-
-echo "Category List";
+/* @var $paginator \Zend\Paginator\Paginator */
+$paginator = $this->categories;
+?>
+    <div class="wdgadmin-toolbar">
+        <a title="Add Category" href="<?php echo $this->url("zfcadmin/wdg-store-admin/category/add");?>" class="btn btn-small btn-primary addtooltip-left">
+            <i class="icon-plus"></i>
+        </a>
+    </div>
+    <table class="table">
+        <tr>
+            <th style="width:40px;">&nbsp</th>
+            <th style="width:40px;">Id</th>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Creation Date</th>
+            <th style="width:40px;">&nbsp</th>
+        </tr>
+        <?php
+        foreach($paginator as $Category)
+        {
+            ?>
+            <tr>
+                <td>
+                    <a title="Show Category" href="<?php echo $this->url("zfcadmin/wdg-store-admin/category/show", array("id" => $Category->getId()));?>" class="btn btn-mini addtooltip-left">
+                        <i class="icon-eye-open"></i>
+                    </a>
+                </td>
+                <td><?php echo $Category->getId();?></td>
+                <td><?php echo $Category->getName();?></td>
+                <td><?php echo $Category->getSlug();?></td>
+                <td><?php echo $Category->getCreated()->format("m-d-Y");?></td>
+                <td>
+                    <a title="Delete Category"
+                       href="<?php echo $this->url("zfcadmin/wdg-store-admin/category/delete", array("id" => $Category->getId()));?>"
+                       class="btn btn-danger btn-mini addtooltip-right"
+                        >
+                        <i class="icon-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        <?php
+        }
+        ?>
+    </table>
+<?php
+echo $this->paginationControl(
+// the paginator object
+    $paginator,
+    // the scrolling style
+    'sliding',
+    // the partial to use to render the control
+    'partial/paginator-item-control.phtml',
+    // the route to link to when a user clicks a control link
+    array(
+        'route' => 'zfcadmin/wdg-store-admin/category/list'
+    )
+);
