@@ -1,0 +1,24 @@
+<?php
+$image      = $this->image;
+$attributes = isset($this->attributes) && is_array($this->attributes) ? $this->attributes : array();
+
+if(!$image)
+    return "";
+
+if(!isset($attributes["alt"]))$attributes["alt"] = $image->getName();
+if(!isset($attributes["title"]))$attributes["title"] = $image->getName();
+
+$attributes_string = "";
+
+foreach ($attributes as $key => $value) {
+    $attributes_string .= ' '.$key.'="'.htmlspecialchars($value).'" '; 
+}
+
+if($image):
+    ?>
+    <img 
+        src="<?php echo $this->getFileById($image->getId())->getUrl();?>" 
+        <?php echo $attributes_string;?>
+        />
+<?php
+endif;

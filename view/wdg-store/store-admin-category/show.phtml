@@ -1,0 +1,56 @@
+<?php $this->headTitle()->append("Store Category"); ?>
+
+<h1><?php echo $this->translate('Store Category') ?></h1>
+
+<ul class="nav nav-tabs" id="storeCategoryTabs" style="margin-bottom:10px">
+    <li class="active"><a href="#tab_info">Info</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="tab_info">
+        <div class="navbar filter-bar">
+            <div class="navbar-inner">
+                <div class="pull-right">
+                    <a href="<?php echo $this->url('zfcadmin/wdg-store-admin/category/edit', array('id' => $this->category->getId())) ?>" class="btn btn-primary">
+                        <?php echo $this->translate('Edit Category') ?>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <?php 
+        $values = array(
+            "Id" => $this->category->getId(),
+            "Name" => $this->category->getName(),
+            "Slug" => $this->category->getSlug(),
+            "Created" => $this->category->getCreated()->format("m-d-Y"),
+        );
+
+        $count  = count($values);
+        $i      = 0;
+        
+        foreach($values as $label => $value)
+        {
+            $i++;
+            ?>
+            <label class="text-info"><?php echo $label;?>:</label>
+            <?php 
+            echo $value;
+            
+            if($i !== $count)
+                echo "<hr />";
+        }
+        ?>
+    </div>    
+</div>
+
+<div class="clearfix"></div>
+<?php
+$script = $this->inlineScript();
+$script->appendScript(<<<'EOT'
+    
+    $("#storeCategoryTabs a").click(function (e) {
+        e.preventDefault();
+        $(this).tab("show");
+    });
+    
+EOT
+);

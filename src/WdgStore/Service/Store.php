@@ -3,9 +3,13 @@ namespace WdgStore\Service;
 
 use Zend\Form\Form,
     WdgZf2\Service\ServiceAbstract,
+    DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as PaginatorAdapter,
+    Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator,
     Zend\Paginator\Paginator as ZendPaginator,
     WdgStore\Entity\Product as ProductEntity,
-    WdgStore\Entity\Category as CategoryEntity;
+    WdgStore\Entity\Category as CategoryEntity,
+    WdgStore\Exception\Service\Store\FormException as FormException,
+    WdgStore\Options\ModuleOptionsInterface;
 
 class Store extends ServiceAbstract
 {
@@ -24,14 +28,18 @@ class Store extends ServiceAbstract
      * @var \WdgStore\Repository\Category
      */
     protected $categoryRepos;
-
+    
+    /**
+     * @var \WdgStore\Options\ModuleOptionsInterface
+     */
+    protected $options;
 
     /**
      * @return \Doctrine\ORM\EntityRepository
      */
     public function getProductRepository()
     {
-        if (null === $this->postRepos)
+        if (null === $this->productRepos)
         {
             $this->productRepos = $this->getServiceManager()->get('wdgstore_repos_product');
         }
@@ -63,6 +71,40 @@ class Store extends ServiceAbstract
         }
 
         return $this->entityManager;
+    }
+    
+    /**
+     * @param int $pageNumber
+     * @param int $productsPerPage
+     * @return ZendPaginator
+     */
+    public function getFeaturedProductsPaginator($pageNumber, $productsPerPage)
+    {
+        $paginator = new ZendPaginator(
+                        new PaginatorAdapter(
+                            new ORMPaginator($this->getProductRepository()
+                                ->findByFeaturedProductsPaginationQuery())
+                        )
+                    );
+        
+        return $paginator->setCurrentPageNumber($pageNumber)->setItemCountPerPage($productsPerPage);
+    }
+    
+    /**
+     * @param int $pageNumber
+     * @param int $productsPerPage
+     * @return ZendPaginator
+     */
+    public function getProductsAlphaPaginator($pageNumber, $productsPerPage)
+    {
+        $paginator = new ZendPaginator(
+                        new PaginatorAdapter(
+                            new ORMPaginator($this->getProductRepository()
+                                ->findAllPaginationQuery())
+                        )
+                    );
+        
+        return $paginator->setCurrentPageNumber($pageNumber)->setItemCountPerPage($productsPerPage);
     }
 
     /**
@@ -131,11 +173,11 @@ class Store extends ServiceAbstract
      */
     public function getEditProductForm($id)
     {
-        $Post = $this->getPostById($id);
+        $Product = $this->getProductById($id);
         /* @var $form \Zend\Form\Form */
-        $form = $this->getServiceManager()->get('FormElementManager')->get('wdgstore_post_edit_form');
+        $form = $this->getServiceManager()->get('FormElementManager')->get('wdgstore_product_edit_form');
 
-        $form->populateValues($Post->toArray());
+        $form->populateValues($Product->toArray());
 
         return $form;
     }
@@ -154,6 +196,102 @@ class Store extends ServiceAbstract
     public function getAddCategoryForm()
     {
         return $this->getServiceManager()->get('FormElementManager')->get('wdgstore_category_add_form');
+    }
+    
+    public function editProductCategoriesByArray($array)
+    {
+        $form   = $this->getProductCategoryForm($array["id"]);
+        $em     = $this->getEntityManager();
+        
+        $form->setData($array);
+        
+        if(!$form->isValid())
+            throw new FormException("Form values are invalid");
+       
+        $data = $form->getInputFilter()->getValues();
+        
+        $Product = $this->getProductById($data["id"]);
+        
+        if(!$Product)throw new FormException("Form values are invalid. Incorrect Product");
+        
+        $Product->getCategories()->clear();
+        
+        if(is_array($data["categories"]))
+            foreach($data["categories"] as $category_id)
+            {
+                $Category = $this->getCategoryById($category_id);
+
+                if(!$Category)throw new FormException("Form values are invalid. Incorrect Category");
+
+                $Product->addCategory($Category);
+            }
+        
+        $em->persist($Product);  
+              
+        $em->flush();
+        
+        return $Product;
+    }
+    
+    /**
+     * @param array $array
+     * @return \WdgStore\Entity\Product
+     * @throws FormException
+     */
+    public function addProductByArray(array $array)
+    {
+        $form   = $this->getAddProductForm();
+        $em     = $this->getEntityManager();
+
+        $form->setData($array);
+
+        if(!$form->isValid())throw new FormException("Form values are invalid");
+
+        $data      = $form->getInputFilter()->getValues();
+        $Product   = new ProductEntity();
+
+        $Product
+            ->setPrice($data["price"])
+            ->setName($data["name"])
+            ->setSlug($data["slug"])
+            ->setFeatured($data["featured"])
+            ->setDescription($data["description"]);
+
+        $em->persist($Product);
+
+        $em->flush();
+
+        return $Product;
+    }
+    
+    /**
+     * @param array $array
+     * @return CategoryEntity
+     * @throws FormException
+     */
+    public function editProductByArray($array)
+    {
+        $form   = $this->getEditProductForm($array["id"]);
+        $em     = $this->getEntityManager();
+        
+        $form->setData($array);
+        
+        if(!$form->isValid())throw new FormException("Form values are invalid");
+        
+        $data       = $form->getInputFilter()->getValues();        
+        $Product    = $this->getProductById($data["id"]);
+        
+        $Product->setPrice($data["price"])
+            ->setName($data["name"])
+            ->setSlug($data["slug"])
+            ->setFeatured($data["featured"])
+            ->setDescription($data["description"]);
+        
+        $em->persist($Product);
+              
+        $em->flush();
+        
+        return $Product;
     }
 
     /**
@@ -210,6 +348,26 @@ class Store extends ServiceAbstract
 
         return $Category;
     }
+    
+    /**
+     * @param int $id
+     * @return \WdgStore\Service\Store
+     * @throws \Exception
+     */
+    public function deleteCategory($id)
+    {
+        $category = $this->getCategoryById($id);
+        
+        if(!$category)
+            throw new \Exception("Could not delete category. That category does not exist.");
+        
+        $em = $this->getEntityManager();
+        
+        $em->remove($category);
+        $em->flush();
+        
+        return $this;
+    }
 
     /**
      * @param string $slug
@@ -230,5 +388,151 @@ class Store extends ServiceAbstract
 
         return $paginator->setCurrentPageNumber($pageNumber)->setItemCountPerPage($productsPerPage);
     }
+    
+    /**
+     * @param \WdgStore\Entity\Product $product
+     * @return Form
+     */
+    public function getProductAddImageForm(ProductEntity $product)
+    {
+        /* @var $form \Zend\Form\Form */
+        $form = $this->getServiceManager()->get('FormElementManager')->get('wdgstore_product_add_image_form');
+        
+        $form->get("product_id")->setValue($product->getId());
+        
+        return $form;
+    }    
+    
+    /**
+     * @return Form
+     */
+    public function getProductCategoryForm($id)
+    {
+        $Product = $this->getProductById($id);
+        /* @var $form \Zend\Form\Form */
+        $form = $this->getServiceManager()->get('FormElementManager')->get('wdgstore_product_category_form');
+        
+        $values = array("id" => $Product->getId());
+        
+        if($form->get("categories") instanceof \Zend\Form\Element\MultiCheckbox)
+        {
+            $category_values = array();
+            
+            foreach($Product->getCategories() as $Category)
+                $category_values[] = $Category->getId();
+            
+            $values["categories"] = $category_values;
+        }
+       
+        $form->populateValues($values);
+        
+        return $form;
+    }    
 
+    public function addProductImageByArray($data)
+    {
+        $product    = $this->getProductById($data["product_id"]);
+        $form       = $this->getProductAddImageForm($product);
+        $em         = $this->getEntityManager();
+
+        $form->setData($data);
+
+        if(!$product || !$form->isValid())throw new FormException("Form values are invalid");
+        
+        $em->beginTransaction();
+        
+        $tags = array();
+            
+        if($this->getOptions()->getImageTag())
+        {
+            $tags[] = $this->getOptions()->getImageTag();
+        }
+
+        /* @var $fileBank \FileBank\Manager */
+        $fileBank = $this->getServiceManager()->get('FileBank');
+
+        /* @var $file \FileBank\Entity\File */
+        $file = $fileBank->save($data["image"]["tmp_name"], $tags);
+
+        if(isset($data["image_name"]) && strlen($data["image_name"]) > 0)
+            $file->setName($data["image_name"]);
+
+        $product->addImage($file);
+
+        $em->persist($file);
+        
+        $em->persist($product);  
+        
+        $em->commit(); 
+              
+        $em->flush();
+        
+        return $file;
+    }
+    
+    /**
+     * @param int $id
+     * @param int $image_id
+     * @throws Exception
+     */
+    public function setImageFeatured($id, $image_id)
+    {
+        $file_service   = $this->getFileService();
+        $file           = $file_service->getFileById($image_id);
+        $product        = $this->getProductById($id);
+        
+        if(!$product || !$file)
+            throw new Exception("Could not find file or product.");
+        
+        $em = $this->getEntityManager();
+        
+        $product->setFeaturedImage($file);
+        
+        $em->persist($product);
+        $em->flush();
+    }
+    
+    /**
+     * @param int $pageNumber
+     * @param int $categoriesPerPage
+     * @return ZendPaginator
+     */
+    public function getCategoriesPaginator($pageNumber, $categoriesPerPage)
+    {
+        $paginator = new ZendPaginator(
+                        new PaginatorAdapter(
+                            new ORMPaginator($this->getCategoryRepository()->findAlphaPaginationQuery())
+                        )
+                    );
+        
+        return $paginator->setCurrentPageNumber($pageNumber)->setItemCountPerPage($categoriesPerPage);
+    }
+    
+    /**
+     * @param \WdgStore\Service\ModuleOptionsInterface $options
+     */
+    public function setOptions( ModuleOptionsInterface $options )
+    {
+        $this->options = $options;
+    }
+
+    /**
+     * @return \WdgStore\Options\ModuleOptionsInterface
+     */
+    public function getOptions()
+    {
+        if (!$this->options instanceof ModuleOptionsInterface) {
+            $this->setOptions($this->getServiceManager()->get('wdgstore_module_options'));
+        }
+        
+        return $this->options;
+    }
+    
+    /**
+     * @return \FileBank\Manager
+     */
+    public function getFileService()
+    {
+        return $this->getServiceManager()->get("FileBank");
+    }
 }

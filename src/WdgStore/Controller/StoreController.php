@@ -8,7 +8,10 @@ class StoreController extends AbstractActionController
 {
     public function indexAction()
     {
-
-        return new ViewModel();
+        /* @var $store_service \WdgStore\Service\Store */
+        $store_service   = $this->getServiceLocator()->get('wdgstore_service_store');
+        $featured_products = $store_service->getFeaturedProductsPaginator(1, 5);
+        
+        return new ViewModel(array("featured_products" => $featured_products));
     }
 }

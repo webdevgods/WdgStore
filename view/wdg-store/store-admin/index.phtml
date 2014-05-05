@@ -1,3 +1,23 @@
-<?php
-
-echo "Store Admin Index";
+<div class="container">
+    <div class="row">
+        <div class="span4">
+            <ul style="list-style: none;">
+                <li>
+                    <a href="<?php echo $this->url("zfcadmin/wdg-store-admin/category/list");?>">
+                        Manage Categories
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo $this->url("zfcadmin/wdg-store-admin/product/list");?>">
+                        Manage Products
+                    </a>
+                </li>
+<!--                <li>
+                    <a href="<?php // echo $this->url("zfcadmin/wdg-store-admin/subscription/list");?>">
+                        Manage Subscriptions
+                    </a>
+                </li>-->
+            </ul>
+        </div>
+    </div>
+</div>

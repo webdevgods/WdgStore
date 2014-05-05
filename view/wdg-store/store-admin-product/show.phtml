@@ -1,0 +1,184 @@
+<?php $this->headTitle()->append("Store Product"); ?>
+
+<h1><?php echo $this->translate('Store Product') ?></h1>
+
+<ul class="nav nav-tabs" id="storeProductTabs" style="margin-bottom:10px">
+    <li class="active"><a href="#tab_info">Info</a></li>
+    <li><a href="#tab_images">Images</a></li>
+    <li><a href="#tab_categories">Categories</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="tab_info">
+        <div class="navbar filter-bar">
+            <div class="navbar-inner">
+                <div class="pull-right">
+                    <a href="<?php echo $this->url('zfcadmin/wdg-store-admin/product/edit', array('id' => $this->product->getId())) ?>" class="btn btn-primary">
+                        <?php echo $this->translate('Edit Product') ?>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <?php 
+        $values = array(
+            "Id" => $this->product->getId(),
+            "Name" => $this->product->getName(),
+            "Slug" => $this->product->getSlug(),
+            "Price" => $this->product->getPrice(),
+            "Featured" => $this->product->isFeaturedString(),
+            "Created" => $this->product->getCreated()->format("m-d-Y"),
+            "Description" => $this->product->getDescription()
+        );
+
+        $count  = count($values);
+        $i      = 0;
+        
+        foreach($values as $label => $value)
+        {
+            $i++;
+            ?>
+            <label class="text-info"><?php echo $label;?>:</label>
+            <?php 
+            echo $value;
+            
+            if($i !== $count)
+                echo "<hr />";
+        }
+        ?>
+    </div>
+    <div class="tab-pane" id="tab_images">
+        <div class="navbar filter-bar">
+            <div class="navbar-inner">
+                <div class="pull-right">
+                    <a href="<?php echo $this->url('zfcadmin/wdg-store-admin/product/image-add', array('id' => $this->product->getId())) ?>" class="btn btn-primary">
+                        <?php echo $this->translate('Add Image') ?>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div>
+            <?php
+            $images = $this->product->getImages();
+
+            if(count($images) > 0)
+            {
+                foreach ($images as $image) 
+                {
+                    $featured = $this->product->isImageFeatured($image);
+                    ?>
+                    <div>
+                        <table class="table">
+                            <tr>
+                                <td rowspan="5" style="width: 125px;text-align: center;">
+                                    <?php
+                                    if($featured):
+                                        ?>
+                                        <div class="alert-success" style="margin-bottom: 3px;">Featured</div>
+                                        <?php
+                                    endif;
+                                    
+                                    echo $this->partial(
+                                        "wdg-store/partial/product-image.phtml", 
+                                        array(
+                                            "image" => $image,
+                                            "attributes" => array(
+                                                "style" => "max-width:100px"
+                                            )
+                                        )
+                                    );
+                                    ?>
+                                </td>
+                                <td>
+                                    <?php
+                                    if(!$featured):
+                                        ?>
+                                        <a href="
+                                            <?php 
+                                            echo $this->url(
+                                                'zfcadmin/wdg-store-admin/product/image-featured', 
+                                                array(
+                                                    'id' => $this->product->getId(),
+                                                    'image_id' => $image->getId()
+                                                )
+                                            ); 
+                                            ?>
+                                        ">
+                                            <?php echo $this->translate('Make Featured') ?>
+                                        </a> | 
+                                    <?php endif;?>
+                                    <a href="
+                                        <?php 
+                                        echo $this->url(
+                                            'zfcadmin/wdg-store-admin/product/image-remove', 
+                                            array(
+                                                'id' => $this->product->getId(),
+                                                'image_id' => $image->getId()
+                                            )
+                                        ); 
+                                        ?>
+                                    ">
+                                        <?php echo $this->translate('Delete') ?>
+                                    </a>                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Name: <?php echo $image->getName();?></td>
+                            </tr>
+                            <tr>
+                                <td>Url: <?php echo $image->getUrl();?></td>
+                            </tr>
+                            <tr>
+                                <td>Mime Type:<?php echo $image->getMimeType();?></td>
+                            </tr>
+                            <tr>
+                                <td>Size: <?php echo $image->getSize();?></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <?php
+                }
+            }
+            else echo "<tr><td>No images</td></tr>";
+            ?>
+        </div>
+    </div>
+    <div class="tab-pane" id="tab_categories">
+        <div class="navbar filter-bar">
+            <div class="navbar-inner">
+                <div class="pull-right">
+                    <a href="<?php echo $this->url('zfcadmin/wdg-store-admin/product/categories', array('id' => $this->product->getId())) ?>" class="btn btn-primary">
+                        <?php echo $this->translate('Manage Categories') ?>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div>
+            <ul>
+            <?php
+            $categories = $this->product->getCategories();
+
+            if(count($categories) > 0)
+            {
+                foreach ($categories as $category) 
+                {
+                    echo "<li>".$category->getName()."</li>";
+                }
+            }
+            else echo "<li>No categories</li>";
+            ?>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="clearfix"></div>
+<?php
+$script = $this->inlineScript();
+$script->appendScript(<<<'EOT'
+    
+    $("#storeProductTabs a").click(function (e) {
+        e.preventDefault();
+        $(this).tab("show");
+    });
+    
+EOT
+);

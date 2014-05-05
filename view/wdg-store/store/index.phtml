@@ -1,3 +1,29 @@
 <?php
-
-echo "Store Index";
+if(count($this->featured_products) > 0)
+{
+    foreach($this->featured_products as $product)
+    {
+        echo $this->partial(
+            "wdg-store/partial/product-image", 
+            array(
+                "image" => $product->getFeaturedImage(),
+                "attributes" => array(
+                    "style" => "width:100px;float:left;clear:left;margin-right:10px;",
+                )
+            )
+        );
+        ?>
+        <h3 style='margin-top:0;padding-top:0;line-height:20px;'>
+            <?php echo $product->getName();?>
+        </h3>
+        <div>
+            $<?php echo number_format($product->getPrice(), 2);?><br />
+            <?php echo $product->getDescription();?>
+        </div>
+        <?php
+    }
+}
+else
+{
+    echo "No featured products";
+}

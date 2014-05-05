@@ -135,6 +135,42 @@ return array(
                                         'priority' => 1000,
                                         'may_terminate' => true,
                                     ),
+                                    'image-add' => array(
+                                        'type' => 'Segment',
+                                        'options' => array(
+                                            'route' => '/image-add[/:id]',
+                                            'defaults' => array(
+                                                'controller' => 'WdgStore\Controller\StoreAdminProduct',
+                                                'action' => 'imageAdd'
+                                            )
+                                        ),
+                                        'priority' => 1000,
+                                        'may_terminate' => true,
+                                    ),
+                                    'image-featured' => array(
+                                        'type' => 'Segment',
+                                        'options' => array(
+                                            'route' => '/image-featured[/:id][/:image_id]',
+                                            'defaults' => array(
+                                                'controller' => 'WdgStore\Controller\StoreAdminProduct',
+                                                'action' => 'imageFeatured'
+                                            )
+                                        ),
+                                        'priority' => 1000,
+                                        'may_terminate' => true,
+                                    ),
+                                    'image-remove' => array(
+                                        'type' => 'Segment',
+                                        'options' => array(
+                                            'route' => '/image-remove[/:id][/:image_id]',
+                                            'defaults' => array(
+                                                'controller' => 'WdgStore\Controller\StoreAdminProduct',
+                                                'action' => 'imageRemove'
+                                            )
+                                        ),
+                                        'priority' => 1000,
+                                        'may_terminate' => true,
+                                    ),
                                 ),
                             ),
                             'category' => array(

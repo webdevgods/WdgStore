@@ -17,7 +17,18 @@ class Module implements ServiceProviderInterface
 
     public function getConfig()
     {
-        return include __DIR__ . '/config/module.config.php';
+        $config         = array();
+        $configFiles    = array(
+            'module.config.php',
+            'routes.config.php',
+        );
+        
+        foreach ($configFiles as $configFile) 
+        {
+            $config = \Zend\Stdlib\ArrayUtils::merge($config, include __DIR__ . '/config/' . $configFile);
+        }
+
+        return $config;
     }
 
     public function getAutoloaderConfig()
@@ -30,15 +41,23 @@ class Module implements ServiceProviderInterface
             ),
         );
     }
+    
+    /**
+     * {@InheritDoc}
+     */
+    public function getControllerConfig() 
+    {
+        return include __DIR__ . '/config/controller.config.php';
+    }
 
     public function getServiceConfig()
     {
         return include __DIR__ . '/config/services.config.php';
     }
-
+    
     /**
-     * {@InheritDoc}
-     */
+    * {@InheritDoc}
+    */
     public function getFormElementConfig()
     {
         return include __DIR__ . '/config/form-elements.config.php';

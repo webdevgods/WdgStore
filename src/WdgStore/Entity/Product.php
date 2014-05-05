@@ -7,16 +7,7 @@ use Doctrine\ORM\Mapping as ORM,
     WdgDoctrine2\Entity\Entity;
 
 /**
- * @ORM\Table(
- *      name                = "wdgstore_products",
- *      uniqueConstraints   = {
- *          @ORM\UniqueConstraint(name="slug_idx", columns={"slug"})
- *      },
- *      indexes = {
- *          @ORM\Index(name="title_idx",        columns={"title"}),
- *          @ORM\Index(name="creationDate_idx", columns={"created"}),
- *      }
- * )
+ * @ORM\Table(name = "wdgstore_products")
  * @ORM\Entity(repositoryClass="WdgStore\Repository\Product")
  */
 class Product extends Entity
@@ -47,30 +38,37 @@ class Product extends Entity
 
     /**
      * @var integer
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="decimal", precision=7, scale=2)
      */
     protected $price;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     protected $slug;
+    
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="integer", length=1)
+     */
+    protected $featured = 0;
 
     /**
-     * @var string
+     * @var ArrayCollection
      *
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToMany(targetEntity="FileBank\Entity\File")
+     *  @ORM\JoinTable(name="wdgstore_product_images")
      */
-    protected $thumbnail = "";
-
+    protected $images;
+    
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=255)
+     * @var \FileBank\Entity\File
+     * @ORM\ManyToOne(targetEntity="FileBank\Entity\File")
      */
-    protected $thumbnail_alt = "";
+    protected $featured_image;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -95,7 +93,9 @@ class Product extends Entity
     public function __construct()
     {
         parent::__construct();
+        
         $this->Categories   = new ArrayCollection();
+        $this->images       = new ArrayCollection();
     }
 
     /**
@@ -150,7 +150,8 @@ class Product extends Entity
      */
     public function setPrice($price)
     {
-        $this->price = (int) $price;
+        $this->price = (float) $price;
+        
         return $this;
     }
 
@@ -169,6 +170,7 @@ class Product extends Entity
     public function setSlug($slug)
     {
         $this->slug = (string)$slug;
+        
         return $this;
     }
 
@@ -181,56 +183,132 @@ class Product extends Entity
     {
         return $this->slug;
     }
-
+   
     /**
-     * Set thumbnail
-     *
-     * @param string $thumbnail
-     *
-     * @return Product
+     * @param int $featured 0 or 1
+     * @return \WdgStore\Entity\Product
      */
-    public function setThumbnail($thumbnail)
+    public function setFeatured($featured)
     {
-        $this->thumbnail = (string)$thumbnail;
+        $this->featured = $featured;
+        
         return $this;
     }
-
+    
     /**
-     * Get thumbnail
-     *
-     * @return string
+     * @return int
      */
-    public function getThumbnail()
+    public function getFeatured()
     {
-        return $this->thumbnail;
+        return $this->featured;
     }
-
-    public function getThumbnailHtml($attributes = "style='width:100px'")
-    {
-        return "<img src='".htmlspecialchars($this->getThumbnail()).
-        "' $attributes alt='".htmlspecialchars($this->getThumbnailAlt())."' ".
-        " title='".htmlspecialchars($this->getThumbnailAlt())."' />";
-    }
-
+    
     /**
-     * @param string $thumbnail_alt
-     * @return Product
+     * @return bool
      */
-    public function setThumbnailAlt($thumbnail_alt)
+    public function isFeatured()
     {
-        $this->thumbnail_alt = (string) $thumbnail_alt;
-
-        return $this;
+        return $this->getFeatured() === 1 ? true : false;
     }
-
+    
     /**
      * @return string
      */
-    public function getThumbnailAlt()
+    public function isFeaturedString()
     {
-        return $this->thumbnail_alt;
+        return $this->isFeatured() ? "yes" : "no";
     }
+    
+    /**
+     * @param \FileBank\Entity\File $image
+     * @return \WdgStore\Entity\Product
+     */
+    public function addImage(\FileBank\Entity\File $image)
+    {
+        $this->images->add($image);
+        
+        return $this;
+    }
+    
+    /**
+     * @return ArrayCollection
+     */
+    public function getImages()
+    {
+        return $this->images;
+    }
+    
+    /**
+     * @param \FileBank\Entity\File $image
+     * @return \WdgStore\Entity\Product
+     */
+    public function removeImage(\FileBank\Entity\File $image)
+    {
+        if (!$this->images->contains($image)) return;
 
+        $this->images->removeElement($image);
+        
+        return $this;
+    }
+    
+    /**
+     * @param \FileBank\Entity\File $image
+     * @return \WdgStore\Entity\Product
+     */
+    public function setFeaturedImage(\FileBank\Entity\File $image)
+    {
+        if(!$this->getImages()->contains($image))
+        {
+            $this->addImage($image);
+        }
+        
+        $this->featured_image = $image;
+        
+        return $this;
+    }
+    
+    /**
+     * @return \FileBank\Entity\File
+     */
+    public function getFeaturedImage()
+    {
+        return $this->featured_image;
+    }
+    
+    /**
+     * @param \FileBank\Entity\File $file
+     * @return boolean
+     */
+    public function isImageFeatured(\FileBank\Entity\File $file)
+    {
+        if($this->getFeaturedImage() && $this->getFeaturedImage()->getId() === $file->getId())
+            return true;
+        
+        return false;
+    }
+    
+    /**
+     * @return bool
+     */
+    public function hasImages()
+    {
+        return $this->getImages()->count() > 0;
+    }
+    
+    /**
+     * 
+     * @return null|\FileBank\Entity\File
+     */
+    public function getFeaturedOrFirstImage()
+    {
+        if($this->getFeaturedImage())
+            return $this->getFeaturedImage();
+        
+        if($this->hasImages())
+            return $this->getImages()->offsetGet(0);
+        
+        return null;
+    }
 
     /**
      * Add categories

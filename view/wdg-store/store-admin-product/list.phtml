@@ -1,3 +1,79 @@
 <?php
+$this->headTitle()->append("Store Products");
 
-echo "Product List";
+$getters = array();
+
+foreach ($this->productlistElements as $element) {
+    $parts = explode('_', $element);
+    array_walk($parts, function (&$val) {
+        $val = ucfirst($val);
+    });
+    $getters[$element] = 'get' . implode('', $parts);
+}
+?>
+
+<h1><?php echo $this->translate('Store Products') ?></h1>
+
+<div class="navbar filter-bar">
+    <div class="navbar-inner">
+        <div class="pull-right">
+            <a href="<?php echo $this->url('zfcadmin/wdg-store-admin/product/add') ?>" class="btn btn-primary">
+                <?php echo $this->translate('Add New Product') ?>
+            </a>
+        </div>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>    
+            <th style="width:40px;">&nbsp</th>
+            <?php foreach ($this->productlistElements as $name => $element): ?>
+                <th><?php echo $this->escapeHtml($name ? : $element); ?></th>
+            <?php endforeach; ?>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php 
+    foreach($this->products as $product)
+    {
+        ?>
+        <tr>
+            <td>
+                <a title="Show Product" href="<?php echo $this->url("zfcadmin/wdg-store-admin/product/show", array("id" => $product->getId()));?>">
+                    <?php echo $product->getId();?>
+                </a>
+            </td>
+            
+            <?php 
+            foreach ($this->productlistElements as $element): ?>
+                <td class="cell cell-<?php echo $this->escapeHtml($element) ?>">
+                    <?php $parts = explode('_', $element); ?>
+                    <?php echo call_user_func(array($product, $getters[$element])); ?>
+                </td>
+            <?php endforeach; ?>
+                
+            <td class="cell cell-ctrls">
+                <a href="<?php echo $this->url('zfcadmin/wdg-store-admin/product/edit', array('id' => $product->getId())); ?>">
+                    <?php echo $this->translate('Edit') ?>
+                </a>
+                |
+                <a href="<?php echo $this->url('zfcadmin/wdg-store-admin/product/delete', array('id' => $product->getId())); ?>"
+                   onclick="return confirm('<?php echo $this->translate('Really delete product?') ?>')">
+                    <?php echo $this->translate('Delete') ?>
+                </a>
+            </td>
+        </tr>
+        <?php
+    }
+    ?>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="<?php echo count($this->productlistElements) + 2; ?>">
+                <?php echo $this->paginationControl($this->products, 'Sliding', 'partial/paginator-item-control.phtml'); ?>
+            </td>
+        </tr>
+    </tfoot>
+</table>

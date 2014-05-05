@@ -6,11 +6,11 @@
             <dt><?php echo $this->formLabel($element);?></dt>
         <?php endif ?>
         <?php if ($element instanceof Zend\Form\Element\Button): ?>
-            <dd><?php echo $this->formButton($element).$this->formElementErrors($element);?></dd>
+            <dd style="margin-bottom: 10px;"><?php echo $this->formButton($element).$this->formElementErrors($element);?></dd>
+        <?php elseif ($element instanceof Zend\Form\Element\File): ?>
+            <dd style="margin-bottom: 10px;"><?php echo $this->formFile($element).$this->formElementErrors($element);?></dd>
         <?php elseif ($element instanceof Zend\Form\Element\Select): ?>
-            <dd><?php echo $this->formSelect($element).$this->formElementErrors($element);?></dd>
-        <?php elseif ($element instanceof Zend\Form\Element\Radio): ?>
-            <dd><?php echo $this->formRadio($element).$this->formElementErrors($element);?></dd>
+            <dd style="margin-bottom: 10px;"><?php echo $this->formSelect($element).$this->formElementErrors($element);?></dd>
         <?php elseif ($element instanceof Zend\Form\Element\Hidden || $element instanceof Zend\Form\Element\Csrf): ?>
             <?php echo $this->formHidden($element).$this->formElementErrors($element);?>
         <?php elseif ($element instanceof Zend\Form\Element\Textarea): ?>

@@ -7,21 +7,11 @@ use Doctrine\ORM\Mapping as ORM,
     WdgDoctrine2\Entity\Entity;
 
 /**
- * @ORM\Table(
- *      name                = "wdgstore_subscriptions",
- *      uniqueConstraints   = {
- *          @ORM\UniqueConstraint(name="slug_idx", columns={"slug"})
- *      },
- *      indexes = {
- *          @ORM\Index(name="title_idx",        columns={"title"}),
- *          @ORM\Index(name="creationDate_idx", columns={"created"}),
- *      }
- * )
+ * @ORM\Table(name = "wdgstore_subscriptions")
  * @ORM\Entity(repositoryClass="WdgStore\Repository\Subscription")
  */
 class Subscription extends Entity
 {
-
     /**
      * @var integer
      *
@@ -52,7 +42,8 @@ class Subscription extends Entity
     protected $price;
 
     /**
-     * @description Frequency in months.
+     * Frequency in months.
+     * 
      * @var integer
      * @ORM\Column(type="integer")
      */

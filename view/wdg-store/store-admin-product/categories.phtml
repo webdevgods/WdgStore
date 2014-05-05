@@ -1,0 +1,63 @@
+<?php 
+$form = $this->form;
+
+$this->headTitle()->append("Store Product Categories"); 
+?>
+
+<h1><?php echo $this->translate('Store Product Categories') ?></h1>
+
+<h3>"<?php echo $this->product->getName();?>"</h3>
+
+<?php
+
+echo $this->form()->openTag($this->form);
+    ?>
+    <dl class="zend_form">
+        <?php 
+        $id = $form->get("id");
+
+        echo $this->formHidden($id).$this->formElementErrors($id);
+
+        $categories = $form->get("categories");
+        ?>
+        <dt><?php echo $this->formLabel($categories);?></dt>
+        <?php
+        if($categories instanceof Zend\Form\Element\Hidden)
+            echo $this->formHidden($categories).$this->formElementErrors($categories);
+        else
+        {
+            ?>
+            <dd style="margin-bottom: 10px;">
+                <?php 
+                $categories->setAttribute("style", "margin-right:8px;");
+                
+                echo $this->FormMultiCheckbox($categories).$this->formElementErrors($categories);
+                ?>
+            </dd>
+            <?php 
+        }
+
+        $csrf = $form->get("csrf");
+
+        echo $this->formHidden($csrf).$this->formElementErrors($csrf);
+
+        try {
+            $submit = $form->get("submit");
+        } catch (\Exception $exc) {
+            $submit = null;
+        } 
+
+        if($submit)
+        {
+            ?>
+            <dd><?php echo $this->formButton($submit).$this->formElementErrors($submit);?></dd>
+            <?php
+        }
+        ?>
+    </dl>
+
+    <?php if ($this->redirect): ?>
+        <input type="hidden" name="redirect" value="<?php echo $this->escapeHtml($this->redirect) ?>" />
+    <?php endif ?>
+        
+<?php echo $this->form()->closeTag() ?>

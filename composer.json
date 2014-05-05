@@ -27,7 +27,8 @@
     "require": {
         "php": ">=5.3.3",
         "webdevgods/wdg-doctrine2": "dev-master",
-        "webdevgods/wdg-zf2": "dev-master"
+        "webdevgods/wdg-zf2": "dev-master",
+        "artur-gajewski/file-bank": "dev-master"
     },
     "suggest": {
         "webdevgods/wdg-base": "Base set of libraries for general php deeds."
