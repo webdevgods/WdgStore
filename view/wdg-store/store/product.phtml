@@ -1,3 +1,45 @@
+<style>
+    .sp-current-big img{
+        max-height: 200px;
+        max-width: 500px;
+    }
+</style>
 <?php
+$this->headLink()->appendStylesheet("/wdg-store/css/smoothproducts.css");
+$this->headScript()->appendFile("/wdg-store/js/smoothproducts.min.js");
+?>
+<h3>
+    <?php echo $this->product->getName();?>
+</h3>
+<div class="sp-wrap">
+    <?php 
+    foreach($this->product->getImages() as $image)
+    {
+        $url = $this->getFileById($image->getId())->getUrl();
+        ?>
+        <a href="<?php echo $url;?>">
+            <img src="<?php echo $url;?>" alt="">
+        </a>        
+        <?php
+    }
+    ?>
+</div>
+<div style="text-align: left;">
+    <div>
+        $<?php echo number_format($this->product->getPrice(), 2);?>
+    </div>
+    <div>
+        <?php echo $this->product->getDescription();?>
+    </div>
+    <div style="clear: both;"></div>
+</div>
 
-echo "Product";
+<?php
+$this->headScript()->appendScript(
+<<<EOD
+    /* wait for images to load */
+    $(window).load( function() {
+        $('.sp-wrap').smoothproducts();
+    });
+EOD
+);
