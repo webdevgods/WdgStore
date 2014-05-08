@@ -31,6 +31,21 @@ class StoreController extends AbstractActionController
         return new ViewModel(array("product" => $product));
     }
     
+    public function categoryAction()
+    {
+        $slug       = $this->params()->fromRoute('slug', '');
+        $service    = $this->getStoreService();
+        $category   = $service->getCategoryBySlug($slug);
+        
+        if(!$category)
+        {
+            $this->getResponse()->setStatusCode(404);
+            return; 
+        }
+        
+        return new ViewModel(array("category" => $category));
+    }
+    
     /**
      * @return \WdgStore\Service\Store
      */

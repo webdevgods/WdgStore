@@ -1,0 +1,63 @@
+<?php
+if(count($this->category->getProducts()) > 0)
+{
+    foreach($this->category->getProducts() as $product)
+    {   
+        $image = $this->partial(
+            "wdg-store/partial/product-image", 
+            array(
+                "image" => $product->getFeaturedImage(),
+                "attributes" => array(
+                    "style" => "width:100px;",
+                )
+            )
+        );
+        ?>
+        <div style="text-align: left;clear: both;margin-bottom: 5px;">
+            <?php
+            if($image):
+                ?>
+                <div style="float: left;height: 110px;width: 110px;">
+                    <a href="<?php echo $this->url("wdg-store/product", array("slug" => $product->getSlug()));?>">
+                        <?php echo $image;?>
+                    </a>
+                </div>
+            <?php
+            else:
+                ?>
+                <div style="
+                     float: left;
+                     height: 80px;
+                     width: 100px;
+                     background-color: #2f2f2f;
+                     padding-top: 30px;
+                     margin-right: 10px;
+                     text-align: center;
+                ">
+                    No Image
+                    <br /><br />
+                    :(
+                </div>
+                <?php
+            endif;
+            ?>
+            <h3 style='margin-top:0;padding-top:0;line-height:20px;'>
+                <a href="<?php echo $this->url("wdg-store/product", array("slug" => $product->getSlug()));?>">
+                    <?php echo $product->getName();?>
+                </a>
+            </h3>
+            <div style="float:right">
+                $<?php echo number_format($product->getPrice(), 2);?>
+            </div>
+            <div>
+                <?php echo $product->getDescription();?>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <?php
+    }
+}
+else
+{
+    echo "No products in this category";
+}

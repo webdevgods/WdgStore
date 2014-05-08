@@ -36,7 +36,7 @@ return array(
                             'defaults' => array(
                                 'page' => 1,
                                 'controller' => 'WdgStore\Controller\Store',
-                                'action' => 'index'
+                                'action' => 'category'
                             )
                         ),
                     )
