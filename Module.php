@@ -62,4 +62,19 @@ class Module implements ServiceProviderInterface
     {
         return include __DIR__ . '/config/form-elements.config.php';
     }
+    
+    public function getViewHelperConfig()
+    {
+        return array(
+            'factories' => array(
+                'wdgStore' => function ($sm) {
+                    $locator = $sm->getServiceLocator();
+                    $viewHelper = new \WdgStore\View\Helper\Store();
+                    $viewHelper->setStoreService($locator->get('wdgstore_service_store'));
+                    return $viewHelper;
+                },
+            )
+        );
+
+    }
 }
